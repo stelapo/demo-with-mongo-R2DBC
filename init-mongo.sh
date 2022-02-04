@@ -1,0 +1,1 @@
+mongo admin --host localhost -u root -p example --eval "db = db.getSiblingDB('stelapodb'); db.createUser({user: 'stelapo', pwd: 'stelapo', roles: [{role: 'readWrite', db: 'stelapodb'}]});"

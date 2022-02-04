@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "669fe911-9d22-4990-be46-58edeaae615c",
+		"name": "demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost search with name/surname",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/users?name=la&surname=p&page=1&size=1&sort=userId,asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"users"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "la"
+						},
+						{
+							"key": "surname",
+							"value": "p"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "1"
+						},
+						{
+							"key": "sort",
+							"value": "userId,asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost search with searchString",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/search?searchString=name:\"a\"&page=0&size=20&sort=name,asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"search"
+					],
+					"query": [
+						{
+							"key": "searchString",
+							"value": "name:\"a\""
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "20"
+						},
+						{
+							"key": "sort",
+							"value": "name,asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost GET",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"infolp@pippo.com\",\r\n    \"address\": \"Via Rossi, Firenze\",\r\n    \"surname\": \"Pancani\",\r\n    \"name\": \"Lapo\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost POST Copy",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"mrossi@test.com\",\r\n    \"address\": \"Via Verdi, Firenze\",\r\n    \"surname\": \"Rossi\",\r\n    \"name\": \"Mario\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost PUT",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Lap\",\r\n    \"surname\": \"Panc\",\r\n    \"address\": \"Via Rossi, Firenze\",\r\n    \"email\": \"infolp@pippo.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost DELETE",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost POST flow",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//NOte: you can keep this request anywhere as setNExtRequest will get executed only after full reqeust flow completes\r",
+							"//so could be used in pre-request or in test-script\r",
+							"\r",
+							"//variables creates local variable so for each collection run the initial value will be undefined , so here we set the value to 3 at start\r",
+							"pm.variables.get(\"retryCounter\") === undefined ? pm.variables.set('retryCounter', pm.variables.get(\"retryCount\")) : null\r",
+							"retryCount = pm.variables.get(\"retryCounter\");\r",
+							"\r",
+							"if (retryCount > 1) {\r",
+							"    pm.variables.set('retryCounter', --retryCount)\r",
+							"    console.log('retry=' + retryCount)\r",
+							"    console.log('pm.info.requestName=' + pm.info.requestName)\r",
+							"    //this gives this request name , you don't have to hardcode\r",
+							"    postman.setNextRequest(pm.info.requestName);\r",
+							"}\r",
+							"//use below else condition if you don't want to execute any equests after this request\r",
+							"/*else{\r",
+							"\r",
+							"postman.setNextRequest(null);\r",
+							"}*/"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Add the count you want, eg:3 means run this request 3 times\r",
+							"pm.variables.set(\"retryCount\", 100);\r",
+							"var retryCount = pm.variables.get(\"retryCounter\") === undefined ? 0 : pm.variables.get(\"retryCounter\");\r",
+							"pm.environment.set('name', 'prova' + retryCount);\r",
+							"pm.environment.set('surname', 'prova' + retryCount);\r",
+							"pm.environment.set('address', 'prova' + retryCount);\r",
+							"pm.environment.set('email', 'prova' + retryCount + '@test.it');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"address\": \"{{address}}\",\r\n    \"surname\": \"{{surname}}\",\r\n    \"name\": \"{{name}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/demo/1.0.0/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"demo",
+						"1.0.0",
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

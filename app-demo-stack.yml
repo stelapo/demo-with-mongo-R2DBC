@@ -1,0 +1,19 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  app:
+    image: 'demo-app-with-mongo:latest'
+    build:
+      context: .
+    #container_name: app-demo-with-mongo
+    depends_on:
+      - mongo
+    environment:
+      - TZ=Europe/Rome
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=INFO
+      - SPRING_DATA_MONGODB_AUTHENTICATION-DATABASE=admin
+      - SPRING_DATA_MONGODB_URI=mongodb://root:example@mongo:27018/admin
+    ports:
+      - "8083:8083"
