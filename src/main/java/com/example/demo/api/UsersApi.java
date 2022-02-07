@@ -2,13 +2,14 @@ package com.example.demo.api;
 
 import com.example.demo.model.SearchCriteria;
 import com.example.demo.model.User;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
@@ -34,7 +35,7 @@ public interface UsersApi {
             value = "/user",
             consumes = {"application/json"}
     )
-    default ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    default ResponseEntity<Mono<User>> createUser(@Valid @RequestBody User user) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -69,7 +70,7 @@ public interface UsersApi {
             value = "/user/{userId}",
             produces = {"application/json"}
     )
-    default ResponseEntity<User> getUser(@PathVariable("userId") Long userId) {
+    default ResponseEntity<Mono<User>> getUser(@PathVariable("userId") Long userId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -87,7 +88,7 @@ public interface UsersApi {
             value = "/users",
             produces = {"application/json"}
     )
-    default ResponseEntity<Page<User>> searchUsers(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "surname", required = false) String surname, Pageable pageable) {
+    default ResponseEntity<Flux<User>> searchUsers(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "surname", required = false) String surname, Pageable pageable) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -107,7 +108,7 @@ public interface UsersApi {
             value = "/user/{userId}",
             consumes = {"application/json"}
     )
-    default ResponseEntity<User> updateUser(@PathVariable("userId") Long userId, @Valid @RequestBody User user) {
+    default ResponseEntity<Mono<User>> updateUser(@PathVariable("userId") Long userId, @Valid @RequestBody User user) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -124,7 +125,7 @@ public interface UsersApi {
             value = "/search",
             produces = {"application/json"}
     )
-    default ResponseEntity<Page<User>> searchUsers(@Pattern(regexp = SearchCriteria.searchStringPatternForController) @RequestParam(value = "searchString", required = false) String searchString, Pageable pageable) {
+    default ResponseEntity<Flux<User>> searchUsers(@Pattern(regexp = SearchCriteria.searchStringPatternForController) @RequestParam(value = "searchString", required = false) String searchString, Pageable pageable) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

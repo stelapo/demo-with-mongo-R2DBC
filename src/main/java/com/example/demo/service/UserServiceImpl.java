@@ -5,92 +5,84 @@ import com.example.demo.model.SearchCriteria;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.specification.UserQueryBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
 
     @Autowired
-    MongoTemplate mongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Override
-    public User createUser(User user) {
+    public Mono<User> createUser(User user) {
         user.setUserId(-1l);
         return userRepository.save(user);
     }
 
     @Override
-    public User updateUser(Long userId, User user) {
-        return userRepository.findById(userId)
-                .map(
-                        (userToUpdate) -> {
-                            user.setUserId(userToUpdate.getUserId());
-                            return userRepository.save(user);
-                        }
-                )
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + userId)
-                )
+    public Mono<User> updateUser(Long userId, User user) {
+        Mono<User> userFoundAndUpdated = findUser(userId)
+                //.switchIfEmpty(Mono.error(new ResourceNotFoundException("User not found with id " + userId))) //Fallback to an alternative Mono if this mono is completed without data
+                .flatMap(u -> { //uso flatMap perchè ricevo l'entity User e restituisco il Mono<User>; con map dovrei restituire sempre l'entity
+                    user.setUserId(u.getUserId());
+                    //return user;
+                    return userRepository.save(user); //errore, perchè save restituisce l'entity
+                })
+                //.flatMap(userRepository::save)
                 ;
+        return userFoundAndUpdated;
+
     }
 
     @Override
-    public User findUser(Long userId) {
+    public Mono<User> findUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + userId)
-                )
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("User not found with id " + userId))) //Fallback to an alternative Mono if this mono is completed without data
                 ;
     }
 
     @Override
     public void deleteUser(Long userId) {
-        userRepository.findById(userId)
-                .map(
-                        user -> {
-                            userRepository.delete(user);
-                            return "OK";
-                        }
-                )
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + userId)
-                )
-        ;
+        //findUser(userId).flatMap(user -> userRepository.delete(user)).block(Duration.ofSeconds(3));
+        findUser(userId).subscribe(successValue -> {
+                    log.info(successValue.getUserId() + "");
+                    userRepository.delete(successValue)
+                            .subscribe(null,
+                                    null,
+                                    () -> log.info("Deleted user!"));
+                },
+                errorConsumer -> log.error("", errorConsumer),
+                () -> log.info("Found user!"));
     }
 
     @Override
-    public Page<User> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Flux<User> findAll(Pageable pageable) {
+        return userRepository.findAll();
     }
 
+
     @Override
-    public Page<User> findByNameAndSurname(String name, String surname, Pageable pageable) {
-        /*UserSpecification specName =
-                new UserSpecification(new SearchCriteria("name", ":", name));
-        UserSpecification surName =
-                new UserSpecification(new SearchCriteria("surname", ":", surname));
-
-        return userRepository.findAll(Specification.where(specName).and(surName), pageable);*/
-
-        return userRepository.findByNameContainingIgnoreCaseAndSurnameContainingIgnoreCase(name==null?"":name, surname==null?"":surname, pageable);
+    public Flux<User> findByNameAndSurname(String name, String surname, Pageable pageable) {
+        return userRepository.findByNameContainingIgnoreCaseAndSurnameContainingIgnoreCase(name == null ? "" : name, surname == null ? "" : surname, pageable);
 
     }
 
     @Override
-    public Page<User> findBySearchString(String searchString, Pageable pageable) {
+    public Flux<User> findBySearchString(String searchString, Pageable pageable) {
         UserQueryBuilder builder = new UserQueryBuilder();
         Pattern pattern = Pattern.compile(SearchCriteria.searchStringPattern);
         Matcher matcher = pattern.matcher(searchString);
@@ -98,11 +90,12 @@ public class UserServiceImpl implements UserService {
             builder.addSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3));
         }
         Query query = builder.build().with(pageable);
-        List<User> userList = mongoTemplate.find(query, User.class);
-        return PageableExecutionUtils.getPage(
+        Flux<User> userList = reactiveMongoTemplate.find(query, User.class);
+        return userList;
+        /*return PageableExecutionUtils.getPage(
                 userList,
                 pageable,
-                () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), User.class));
+                () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), User.class));*/
 
     }
 }
