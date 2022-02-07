@@ -7,9 +7,11 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.specification.UserQueryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -76,13 +78,17 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Flux<User> findByNameAndSurname(String name, String surname, Pageable pageable) {
-        return userRepository.findByNameContainingIgnoreCaseAndSurnameContainingIgnoreCase(name == null ? "" : name, surname == null ? "" : surname, pageable);
-
+    public Page<User> findByNameAndSurname(String name, String surname, Pageable pageable) {
+        Flux<User> userFlux = userRepository.findByNameContainingIgnoreCaseAndSurnameContainingIgnoreCase(name == null ? "" : name, surname == null ? "" : surname, pageable);
+        return PageableExecutionUtils.getPage(
+                userFlux.toStream().toList(),
+                pageable,
+                () -> userRepository.countByNameContainingIgnoreCaseAndSurnameContainingIgnoreCase(name == null ? "" : name, surname == null ? "" : surname).block()
+        );
     }
 
     @Override
-    public Flux<User> findBySearchString(String searchString, Pageable pageable) {
+    public Page<User> findBySearchString(String searchString, Pageable pageable) {
         UserQueryBuilder builder = new UserQueryBuilder();
         Pattern pattern = Pattern.compile(SearchCriteria.searchStringPattern);
         Matcher matcher = pattern.matcher(searchString);
@@ -90,12 +96,13 @@ public class UserServiceImpl implements UserService {
             builder.addSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3));
         }
         Query query = builder.build().with(pageable);
-        Flux<User> userList = reactiveMongoTemplate.find(query, User.class);
-        return userList;
-        /*return PageableExecutionUtils.getPage(
-                userList,
+        Flux<User> userFlux = reactiveMongoTemplate.find(query, User.class);
+        return PageableExecutionUtils.getPage(
+                userFlux.toStream().toList(),
                 pageable,
-                () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), User.class));*/
+                () -> reactiveMongoTemplate.count(Query.of(query).limit(-1).skip(-1), User.class).block()
+        );
+
 
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +17,7 @@ public interface UserService {
 
     Flux<User> findAll(Pageable pageable);
 
-    Flux<User> findByNameAndSurname(String name, String surname, Pageable pageable);
+    Page<User> findByNameAndSurname(String name, String surname, Pageable pageable);
 
-    Flux<User> findBySearchString(String searchString, Pageable pageable);
+    Page<User> findBySearchString(String searchString, Pageable pageable);
 }

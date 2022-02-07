@@ -24,7 +24,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("start data initialization  ...");
-        this.userRepository
+        /*this.userRepository
                 .deleteAll()
                 .thenMany(
                         Flux
@@ -38,7 +38,7 @@ public class DataInitializer implements CommandLineRunner {
                         null,
                         null,
                         () -> log.info("done initialization...")
-                );
+                );*/
         log.info("initialization chained  ...");
     }
 }
