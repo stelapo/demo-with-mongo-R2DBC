@@ -1,18 +1,20 @@
 package com.example.demo;
 
+import com.example.demo.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 
@@ -35,6 +37,9 @@ class DemoApplicationTests {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    WebTestClient webTestClient;
+
     final String context = "/demo/1.0.0";
     HttpHeaders httpHeaders;
 
@@ -47,9 +52,21 @@ class DemoApplicationTests {
     }
 
     @Test
-    public void test01_PostResource() throws Exception {
+    public void test01_PostResource_mock() throws Exception {
 
-        mockMvc.perform(
+        /*User userRequest = User.builder().name("Lapo").surname("Pancani").email("infolp@pippo.com").address("Via Rossi, Firenze").build();
+
+        webTestClient.post().uri(context + "/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(userRequest), User.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.userId").isEqualTo(1);*/
+
+        MvcResult result = mockMvc.perform(
                         post(context + "/user")
                                 .headers(httpHeaders)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,11 +82,35 @@ class DemoApplicationTests {
                 .andExpect(jsonPath("$.name").value("Lapo"))
                 .andExpect(jsonPath("$.surname").value("Pancani"))
                 .andExpect(jsonPath("$.address").value("Via Rossi, Firenze"))
-                .andExpect(jsonPath("$.email").value("infolp@pippo.com"));
+                .andExpect(jsonPath("$.email").value("infolp@pippo.com"))
+                .andReturn();
+        System.out.println("ECCOMI: " + result.getResponse().getContentAsString());
+
     }
 
     @Test
-    public void test02_PutResource() throws Exception {
+    public void test02_PostResource_wtc() throws Exception {
+
+        User userRequest = User.builder().name("Lapo").surname("Pancani").email("infolp@pippo.com").address("Via Rossi, Firenze").build();
+
+        webTestClient.post().uri(context + "/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(userRequest), User.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.userId").isEqualTo(2)
+                .jsonPath("$.name").isEqualTo("Lapo")
+                .jsonPath("$.surname").isEqualTo("Pancani")
+                .jsonPath("$.address").isEqualTo("Via Rossi, Firenze")
+                .jsonPath("$.email").isEqualTo("infolp@pippo.com");
+
+    }
+
+    @Test
+    public void test03_PutResourc_mock() throws Exception {
 
         mockMvc.perform(
                         put(context + "/user/1")
@@ -83,7 +124,7 @@ class DemoApplicationTests {
                                         "}")
                 )
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value(1))
+                //.andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.name").value("Mario"))
                 .andExpect(jsonPath("$.surname").value("Rossi"))
                 .andExpect(jsonPath("$.address").value("Via Verdi, Arezzo"))
@@ -91,12 +132,31 @@ class DemoApplicationTests {
     }
 
     @Test
-    public void test03_GetResource() throws Exception {
+    public void test04_PutResource_wct() throws Exception {
+        User userRequest = User.builder().name("Mario").surname("Rossi").email("infolp@pippo.com").address("Via Verdi, Arezzo").build();
+
+        webTestClient.put().uri(context + "/user/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(userRequest), User.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.userId").isEqualTo(2)
+                .jsonPath("$.name").isEqualTo("Mario")
+                .jsonPath("$.surname").isEqualTo("Rossi")
+                .jsonPath("$.address").isEqualTo("Via Verdi, Arezzo")
+                .jsonPath("$.email").isEqualTo("infolp@pippo.com");
+    }
+
+    @Test
+    public void test05_GetResource_mock() throws Exception {
         mockMvc.perform(
                         get(context + "/user/1")
                                 .headers(httpHeaders)
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.userId").value(2))
                 .andExpect(jsonPath("$.name").value("Mario"))
                 .andExpect(jsonPath("$.surname").value("Rossi"))
                 .andExpect(jsonPath("$.address").value("Via Verdi, Arezzo"))
@@ -104,6 +164,21 @@ class DemoApplicationTests {
     }
 
     @Test
+    public void test06_GetResource_wtc() throws Exception {
+        webTestClient.get().uri(context + "/user/2")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.userId").isEqualTo(2)
+                .jsonPath("$.name").isEqualTo("Mario")
+                .jsonPath("$.surname").isEqualTo("Rossi")
+                .jsonPath("$.address").isEqualTo("Via Verdi, Arezzo")
+                .jsonPath("$.email").isEqualTo("infolp@pippo.com");
+    }
+
+    /*@Test
     public void test04_SearchResource() throws Exception {
         mockMvc.perform(
                         get(context + "/users")
@@ -318,6 +393,6 @@ class DemoApplicationTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations[0].fieldName").value("email"))
                 .andExpect(jsonPath("$.violations[0].message").value("Email should be valid"));
-    }
+    }*/
 
 }

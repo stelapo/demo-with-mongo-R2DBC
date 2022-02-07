@@ -3,6 +3,7 @@ package com.example.demo.api;
 import com.example.demo.model.SearchCriteria;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("${simpleUser.basepath:/demo/1.0.0}")
+@Slf4j
 public class UsersApiController implements UsersApi {
 
     private final NativeWebRequest request;
@@ -38,7 +40,9 @@ public class UsersApiController implements UsersApi {
     @Override
     public ResponseEntity<Mono<User>> createUser(@Valid @RequestBody User user) {
         if (ApiUtil.applicationJsonHeaderExists(request)) {
-            return new ResponseEntity<Mono<User>>(userService.createUser(user), HttpStatus.CREATED);
+            log.info("GETTTTT !!!!!!");
+            ResponseEntity<Mono<User>> responseEntity = new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
+            return responseEntity;
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

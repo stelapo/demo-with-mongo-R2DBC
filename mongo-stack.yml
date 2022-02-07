@@ -16,8 +16,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-      - myMongoDb2:/data/db
-      - myMongoConfig2:/data/configdb
+      #- myMongoDb2:/data/db
+      #- myMongoConfig2:/data/configdb
 
   mongo-express:
     image: mongo-express
@@ -29,6 +29,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27018/
 
-volumes:
-  myMongoDb2:
-  myMongoConfig2:
+#volumes:
+  #myMongoDb2:
+  #myMongoConfig2:
